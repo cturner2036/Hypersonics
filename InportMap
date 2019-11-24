@@ -1,0 +1,120 @@
+%% Import data from spreadsheet
+% Script for importing data from the following spreadsheet:
+%%
+% 
+%    Workbook: [path]\3X GHV Inlet Map-1.xlsx
+%    Worksheet: 3X GHV Inlet
+%
+%% Setup the Import Options
+
+opts = spreadsheetImportOptions("NumVariables", 40);
+
+% Specify sheet and range
+opts.Sheet = "3X GHV Inlet";
+opts.DataRange = "A4:AN51";
+
+% Specify column names and types
+opts.VariableNames = ["FlightMachNumber", "AngleofAttackdeg", "YawAngledeg", "DynamicPressurepsf", "Altitudeft", "FreestreamPressurepsia", "FreestreamTotalPressurepsia", "FreestreamTemperaturedegR", "FreestreamTotalTemperaturedegR", "FreestreamEquilibriumGamma", "FreestreamVelocityfts", "VarName12", "PhysicalCaptureAreain2", "EffectiveStreamtubeCapturein2", "InletMassCaptureRatio", "PhysicalContractionRatio", "ThroatAreain2", "EffectiveStreamtubeContractionRatio", "FreestreamMassFlowRatelbms", "CapturedMassFlowRatelbms", "BypassedAirflowlbms", "KineticEnergyEfficiency", "VarName23", "ThroatPressurepsia", "ThroatTotalPressurepsia", "ThroatTemperaturedegR", "ThroatTotalTemperaturedegR", "ThroatMachNumber", "ThroatGamma", "ThroatVelocityfts", "VarName31", "IsolatorHeatLossBTUlbm", "IsolatorExitAreain2", "NormalShockPressureRatio", "IsolatorPressureRatio", "VarName36", "InletAxialForcelbf", "InletAxialForceCoefficient", "InletNormalForcelbf", "InletNormalForceCoefficient"];
+opts.VariableTypes = ["double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "string", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "string", "double", "double", "double", "double", "double", "double", "double", "string", "double", "double", "double", "double", "string", "double", "double", "double", "double"];
+opts = setvaropts(opts, [12, 23, 31, 36], "WhitespaceRule", "preserve");
+opts = setvaropts(opts, [12, 23, 31, 36], "EmptyFieldRule", "auto");
+
+% Import the data
+[spreadsheet,filepath] = uigetfile('3X GHV Inlet Map-1.xlsx');
+GHV_inlet_map = strcat(filepath, spreadsheet)
+
+tbl = readtable(GHV_inlet_map, opts, "UseExcel", false);
+%% Scale tbl to 5x vehicle
+%%
+% input data is for 3X vehicle (30 lbs/sec)
+% Target is 5X
+tmp_scale = 5/3;
+%tbl.FlightMachNumber;
+%tbl.AngleofAttackdeg;
+%tbl.YawAngledeg;
+%tbl.DynamicPressurepsf;
+%tbl.Altitudeft;
+%tbl.FreestreamPressurepsia;
+%tbl.FreestreamTotalPressurepsia;
+%tbl.FreestreamTemperaturedegR;
+%tbl.FreestreamTotalTemperaturedegR;
+%tbl.FreestreamEquilibriumGamma;
+%tbl.FreestreamVelocityfts;
+tbl.PhysicalCaptureAreain2=tbl.PhysicalCaptureAreain2*tmp_scale;
+tbl.EffectiveStreamtubeCapturein2=tbl.EffectiveStreamtubeCapturein2*tmp_scale;
+%tbl.InletMassCaptureRatio;
+%tbl.PhysicalContractionRatio;
+tbl.ThroatAreain2=tbl.ThroatAreain2*tmp_scale;
+%tbl.EffectiveStreamtubeContractionRatio;
+tbl.FreestreamMassFlowRatelbms=tbl.FreestreamMassFlowRatelbms*tmp_scale;
+tbl.CapturedMassFlowRatelbms=tbl.CapturedMassFlowRatelbms*tmp_scale;
+tbl.BypassedAirflowlbms=tbl.BypassedAirflowlbms*tmp_scale;
+%tbl.KineticEnergyEfficiency;
+%tbl.ThroatPressurepsia;
+%tbl.ThroatTotalPressurepsia;
+%tbl.ThroatTemperaturedegR;
+%tbl.ThroatTotalTemperaturedegR;
+%tbl.ThroatMachNumber;
+%tbl.ThroatGamma;
+%tbl.ThroatVelocityfts;
+tbl.IsolatorHeatLossBTUlbm=tbl.IsolatorHeatLossBTUlbm*tmp_scale;
+tbl.IsolatorExitAreain2=tbl.IsolatorExitAreain2*tmp_scale;
+%tbl.NormalShockPressureRatio;
+%tbl.IsolatorPressureRatio;
+tbl.InletAxialForcelbf=tbl.InletAxialForcelbf*tmp_scale;
+tbl.InletAxialForceCoefficient=tbl.InletAxialForceCoefficient*tmp_scale;
+tbl.InletNormalForcelbf=tbl.InletNormalForcelbf*tmp_scale;
+%tbl.InletNormalForceCoefficient;
+%% Convert to output type
+%%
+FlightMachNumber = mytable(tbl.FlightMachNumber);
+AngleofAttack_deg = mytable(tbl.AngleofAttackdeg);
+YawAngle_deg = mytable(tbl.YawAngledeg);
+DynamicPressure_psf = mytable(tbl.DynamicPressurepsf);
+Altitude_ft = mytable(tbl.Altitudeft);
+FreestreamPressure_psia = mytable(tbl.FreestreamPressurepsia);
+FreestreamTotalPressure_psia = mytable(tbl.FreestreamTotalPressurepsia);
+FreestreamTemperature_degR = mytable(tbl.FreestreamTemperaturedegR);
+FreestreamTotalTemperature_degR = mytable(tbl.FreestreamTotalTemperaturedegR);
+FreestreamEquilibriumGamma = mytable(tbl.FreestreamEquilibriumGamma);
+FreestreamVelocity_fts = mytable(tbl.FreestreamVelocityfts);
+PhysicalCaptureArea_in2 = mytable(tbl.PhysicalCaptureAreain2);
+EffectiveStreamtubeCapture_in2 = mytable(tbl.EffectiveStreamtubeCapturein2);
+InletMassCaptureRatio = mytable(tbl.InletMassCaptureRatio);
+PhysicalContractionRatio = mytable(tbl.PhysicalContractionRatio);
+ThroatArea_in2 = mytable(tbl.ThroatAreain2);
+EffectiveStreamtubeContractionRatio = mytable(tbl.EffectiveStreamtubeContractionRatio);
+FreestreamMassFlowRate_lbms = mytable(tbl.FreestreamMassFlowRatelbms);
+CapturedMassFlowRate_lbms = mytable(tbl.CapturedMassFlowRatelbms);
+BypassedAirflow_lbms = mytable(tbl.BypassedAirflowlbms);
+KineticEnergyEfficiency = mytable(tbl.KineticEnergyEfficiency);
+ThroatPressure_psia = mytable(tbl.ThroatPressurepsia);
+ThroatTotalPressure_psia = mytable(tbl.ThroatTotalPressurepsia);
+ThroatTemperature_degR = mytable(tbl.ThroatTemperaturedegR);
+ThroatTotalTemperature_degR = mytable(tbl.ThroatTotalTemperaturedegR);
+ThroatMachNumber = mytable(tbl.ThroatMachNumber);
+ThroatGamma = mytable(tbl.ThroatGamma);
+ThroatVelocity_fts = mytable(tbl.ThroatVelocityfts);
+IsolatorHeatLossBTU_lbm = mytable(tbl.IsolatorHeatLossBTUlbm);
+IsolatorExitArea_in2 = mytable(tbl.IsolatorExitAreain2);
+NormalShockPressureRatio = mytable(tbl.NormalShockPressureRatio);
+IsolatorPressureRatio = mytable(tbl.IsolatorPressureRatio);
+InletAxialForce_lbf = mytable(tbl.InletAxialForcelbf);
+InletAxialForceCoefficient = mytable(tbl.InletAxialForceCoefficient);
+InletNormalForce_lbf = mytable(tbl.InletNormalForcelbf);
+InletNormalForceCoefficient = mytable(tbl.InletNormalForceCoefficient);
+x_Mach = [4 4.5 5 5.5 6 6.5 7];
+y_AoA = [-4 -2 0 2 4 6];
+%% Clear temporary variables
+%%
+clear opts tbl tmp_scale
+
+%% Function to create 2D matrix of data
+% Puts data in format needed to use interp2 function for querying vlaues using 
+% Mach and AoA
+% 
+% use function interp2(x_Mach,y_AoA, Variable, xq,yq)
+
+function output = mytable(input)
+output = [input(1:6) input(8:13) input(15:20) input(22:27) input(29:34) input(36:41) input(43:48)];
+end
