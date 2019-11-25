@@ -60,7 +60,11 @@ for i = 1:step_size
     
     % Calculate Mach and PM Angles
     dummy_angle = 0;
-    mach_numbers(i) = 1;
+    if 1~=i
+       mach_numbers(i) = mach_numbers(i-1);
+    else
+       mach_numbers(i) = 1;
+    end
     while (dummy_angle < turn_steps2(i))
         pm1 = sqrt((gam+1)/(gam-1));
         pm2 = (gam-1)/(gam+1);
