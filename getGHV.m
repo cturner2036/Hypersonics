@@ -39,7 +39,7 @@ if (0 == SI_flag)
     GHV_Instance.DynamicPressure_psf = DynamicPressure;
     GHV_Instance.DynamicPressure_Pa = DynamicPressure*Pa_psi/144; % convert psf to psi to Pa
 else
-    GHV_Instance.DynamicPressure_pa = DynamicPressure;
+    GHV_Instance.DynamicPressure_Pa = DynamicPressure;
     GHV_Instance.DynamicPressure_psf = DynamicPressure*144/Pa_psi; % convert Pa to psi to psf
 end
 Qscale = GHV_Instance.DynamicPressure_psf / interp2(x, y, GHV_dataset.DynamicPressure_psf,xq,yq);
