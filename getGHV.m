@@ -43,7 +43,8 @@ else
     GHV_Instance.DynamicPressure_psf = DynamicPressure*144/Pa_psi; % convert Pa to psi to psf
 end
 Qscale = GHV_Instance.DynamicPressure_psf / interp2(x, y, GHV_dataset.DynamicPressure_psf,xq,yq);
-[T0_degR, P0_psi, rho0_slugft3,hgeom_ft] = AtmosQM(GHV_Instance.DynamicPressure_psf,Mach);
+[T0_degR, P0_psf, rho0_slugft3,hgeom_ft] = AtmosQM(GHV_Instance.DynamicPressure_psf,Mach);
+P0_psi = P0_psf/144;
 T_scale = T0_degR/interp2(x, y, GHV_dataset.FreestreamTemperature_degR,xq,yq);
 P_scale = P0_psi / interp2(x,y,GHV_dataset.FreestreamPressure_psia,xq,yq);
 m_scale = P_scale / sqrt(T_scale);
