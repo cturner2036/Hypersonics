@@ -21,7 +21,7 @@ opts = setvaropts(opts, [12, 23, 31, 36], "WhitespaceRule", "preserve");
 opts = setvaropts(opts, [12, 23, 31, 36], "EmptyFieldRule", "auto");
 % Import the data
 [spreadsheet,filepath] = uigetfile('3X GHV Inlet Map-1.xlsx');
-GHV_inlet_map = strcat(filepath, spreadsheet)
+GHV_inlet_map = strcat(filepath, spreadsheet);
 tbl = readtable(GHV_inlet_map, opts, "UseExcel", false);
 %% Scale tbl to 5x vehicle
 % input data is for 3X vehicle (30 lbs/sec)
@@ -56,7 +56,7 @@ tbl.BypassedAirflowlbms=tbl.BypassedAirflowlbms*tmp_scale;
 %tbl.ThroatMachNumber;
 %tbl.ThroatGamma;
 %tbl.ThroatVelocityfts;
-tbl.IsolatorHeatLossBTUlbm=tbl.IsolatorHeatLossBTUlbm*tmp_scale;
+%tbl.IsolatorHeatLossBTUlbm=tbl.IsolatorHeatLossBTUlbm;
 tbl.IsolatorExitAreain2=tbl.IsolatorExitAreain2*tmp_scale;
 %tbl.NormalShockPressureRatio;
 %tbl.IsolatorPressureRatio;
@@ -104,6 +104,44 @@ GHV_dataset.InletNormalForceCoefficient = mytable(tbl.InletNormalForceCoefficien
 GHV_dataset.x_Mach = GHV_dataset.FlightMachNumber(1,:);
 GHV_dataset.y_AoA = GHV_dataset.AngleofAttack_deg(:,1);
 GHV_dataset.SI_Flag = 0; % 0 = English units
+
+% Add Constants
+GHV_dataset.R_BTU_lbmolR = 1.986;
+GHV_dataset.R_ftlbf_lbmolR = 1545;
+GHV_dataset.MW_air = 28.965;
+%Add Isolator Exit definitions
+GHV_dataset.IsolatorExitPressure_psia = GHV_dataset.IsolatorPressureRatio .* GHV_dataset.ThroatPressure_psia;
+GHV_dataset.IsolatorExitGamma = 1.4*ones(6,7);
+GHV_dataset.IsolatorExitCp_BTU_lbmR = (GHV_dataset.R_BTU_lbmolR/GHV_dataset.MW_air)*GHV_dataset.IsolatorExitGamma./(GHV_dataset.IsolatorExitGamma-1);
+GHV_dataset.IsolatorExitTotalTemperature_R = GHV_dataset.ThroatTotalTemperature_degR - GHV_dataset.IsolatorHeatLoss_BTU_lbm./GHV_dataset.IsolatorExitCp_BTU_lbmR;
+
+% Find Effective Exit Area @Design
+gc=32.174;
+R2_ft_R = GHV_dataset.R_ftlbf_lbmolR / GHV_dataset.MW_air;
+M2 = 1.46;
+mygamma = GHV_dataset.IsolatorExitGamma(3,5);
+Tt2 = GHV_dataset.IsolatorExitTotalTemperature_R(3,5);
+T2_R = Tt2/(1+0.5*(mygamma-1)*M2^2);
+P2_psia = GHV_dataset.IsolatorExitPressure_psia(3,5);
+m_dot2 = GHV_dataset.CapturedMassFlowRate_lbms(3,5);
+v2 = M2 * sqrt(mygamma*R2_ft_R*T2_R*gc);
+A2_in2 = m_dot2 * R2_ft_R * T2_R / (P2_psia*v2);
+
+%Fix effective exit area for all conditions
+GHV_dataset.IsolatorEffectiveExitArea_in2 = A2_in2 * ones(6,7);
+
+% Find isolator Exit Mach at all conditions - solve quadratic function of M^2
+f1 = 1./(GHV_dataset.IsolatorExitGamma-1);
+f2 = GHV_dataset.CapturedMassFlowRate_lbms.^2 .*GHV_dataset.IsolatorExitTotalTemperature_R.*R2_ft_R;
+f3 = GHV_dataset.IsolatorEffectiveExitArea_in2.^2 .*GHV_dataset.IsolatorExitPressure_psia.^2 .*GHV_dataset.IsolatorExitGamma.*gc;
+GHV_dataset.IsolatorExitMach = (-f1 + (f1.^2 + 2.*f1.*f2./f3).^0.5).^0.5;
+
+% Find isolator Exit Temperature and total pressure
+f1=(1+0.5*(GHV_dataset.IsolatorExitGamma-1).*GHV_dataset.IsolatorExitMach.^2);
+GHV_dataset.IsolatorExitTemperature_R = GHV_dataset.IsolatorExitTotalTemperature_R./f1;
+f2 = f1.^(GHV_dataset.IsolatorExitGamma./(GHV_dataset.IsolatorExitGamma-1));
+GHV_dataset.IsolatorExitTotalPressure_psia = GHV_dataset.IsolatorExitPressure_psia.*f2;
+
 end
 %% Function to create 2D matrix of data
 % Puts data in format needed to use interp2 function for querying vlaues using 
