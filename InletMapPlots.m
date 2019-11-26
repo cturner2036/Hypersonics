@@ -35,6 +35,14 @@ createfigure(x,y,myGHV.InletAxialForce_lbf, 'Inlet Axial Force', 'Force (lb_f)')
 createfigure(x,y,myGHV.InletAxialForceCoefficient, 'Inlet Axial Force Coefficient', 'Coefficient');
 createfigure(x,y,myGHV.InletNormalForce_lbf, 'Normal Force', 'Force (lb_f)');
 createfigure(x,y,myGHV.InletNormalForceCoefficient,'Normal Force Coefficient','Coefficient');
+createfigure(x,y,myGHV.IsolatorExitPressure_psia,'Isolator Exit Pressure','Pressure (psia)');
+createfigure(x,y,myGHV.IsolatorExitGamma,'Isolator Exit Gamma','\gamma');
+createfigure(x,y,myGHV.IsolatorExitCp_BTU_lbmR,'Isolator Exit C_p','C_p (BTU/lb_m\cdot\circR)');
+createfigure(x,y,myGHV.IsolatorExitTotalTemperature_R,'Isolator Exit Total Temperature','Temperature (\circR)');
+createfigure(x,y,myGHV.IsolatorEffectiveExitArea_in2,'Isolator Effective Exit Area','Area (in^2)');
+createfigure(x,y,myGHV.IsolatorExitMach,'Isolator Exit Mach','Mach');
+createfigure(x,y,myGHV.IsolatorExitTemperature_R,'Isoaltor Exit Temperature','Temperature (\circR)');
+createfigure(x,y,myGHV.IsolatorExitTotalPressure_psia,'Isolator Exit Total Pressure', 'Pressure (psia)');
 
 %%
 function createfigure(xdata, ydata, zdata, myTitle, ztitle)
