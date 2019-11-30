@@ -104,10 +104,10 @@ M_exit_check = mach_numbers(end);
 y_height = real(y(end))-y(1);
 x_length = real(x(end))-x(1);
 
-cout = ['Truncated Expansion Ramp Study. Expansion Ratio is: ',num2str(AR_check),...
-    '. Exit Mach is: ' ,num2str(M_exit_check),'. Total Height is: ', num2str(y_height),...
-    '. Total Length is: ',num2str(x_length),'.'];
-disp(cout)
+% cout = ['Truncated Expansion Ramp Study. Expansion Ratio is: ',num2str(AR_check),...
+%     '. Exit Mach is: ' ,num2str(M_exit_check),'. Total Height is: ', num2str(y_height),...
+%     '. Total Length is: ',num2str(x_length),'.'];
+% disp(cout)
 
 % Calcuate Cowl Position w.r.t. Ramp Origin
 slope = (y(2)-y(1))/(x(2)-x(1));

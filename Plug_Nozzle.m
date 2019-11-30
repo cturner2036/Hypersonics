@@ -89,9 +89,9 @@ y_height = y(1) - y(end);
 x_length = x(end) - x(1);
 d_cowl = sqrt( (x(1)-0)^2 + (y(1)-cowl_height)^2 );
 
-cout = ['Perfect Expansion Ramp Study. Expansion Ratio is: ',num2str(AR),...
-    '. Exit Mach is: ' ,num2str(M_exit),'. Only Ramp Height is: ', num2str(y_height),...
-    '. Total Length is: ',num2str(x_length),'.'];
+% cout = ['Perfect Expansion Ramp Study. Expansion Ratio is: ',num2str(AR),...
+%     '. Exit Mach is: ' ,num2str(M_exit),'. Only Ramp Height is: ', num2str(y_height),...
+%     '. Total Length is: ',num2str(x_length),'.'];
 
 %disp(cout)
 
@@ -103,14 +103,3 @@ cout = ['Perfect Expansion Ramp Study. Expansion Ratio is: ',num2str(AR),...
 % ylabel('Nozzle Height')
 % grid on
 % axis equal
-
-disp(cout)
-
-figure (1)
-plot(x,y)
-hold on
-plot(-x_hold,-1*(cowl_height-y_hold),'o')
-xlabel('Nozzle Length')
-ylabel('Nozzle Height')
-grid on
-axis equal
