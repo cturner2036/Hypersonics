@@ -1,4 +1,4 @@
-function [Total_Thrust, Total_Lift] = Flow_Properties(step_size,P_amb,T_exit,Pt_exit,throat_angle,body_width,M_throat,y,x,alpha,Q,m_dot,gamma);
+function [Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit,throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
 % Read Me %
 % This script takes the x,y contour data from the contour scripts, along
 % with the throat angle, throat area, local turn, step size, and body
@@ -9,7 +9,7 @@ function [Total_Thrust, Total_Lift] = Flow_Properties(step_size,P_amb,T_exit,Pt_
 % Exit Flow Properties
 %M_throat = 1.15;    % Throat Mach
 %mdot = 50/2.205;    % Mass Flow Rate (kg/s)
-%R = 287;            % Specific Gas Constant (J/kg-K)
+R = 287;            % Specific Gas Constant (J/kg-K)
 %gamma = 1.4;        % Ratio Specific Heats
 %Q = 1500*47.88;     % Dynamic Pressure (Pa)
 %alpha = 3;          % Angle of Attack
@@ -170,8 +170,8 @@ for i = 1:step_size-1
 end
 
 % Combined Thrust and Lift Term (kN)
-Total_Thrust = (T_pressure + T_jet + T_base)/1000;
-Total_Lift = (L_pressure - L_jet + L_base)/1000;
+Engine_Thrust = (T_pressure + T_jet + T_base)/1000;
+Engine_Lift = (L_pressure - L_jet + L_base)/1000;
 
 
 %% Center of Pressure - Centerbody

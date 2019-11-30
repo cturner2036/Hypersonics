@@ -147,6 +147,6 @@ end
 Cd = ACd;
 Cl = NCd;
 Lift_to_Drag = Cl/Cd;
-D = weight/Lift_to_Drag;
+D = (weight/Lift_to_Drag)/1000; %[kN]
 
 end

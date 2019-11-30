@@ -1,4 +1,4 @@
-function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,AngleofAttack,Dry_Weight,Fuel_Weight,SI_Flag)
+function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,AngleofAttack,Dry_Weight,Fuel_Weight,SI_Flag,AFC,NFC)
     %Constants
     Total_Weight = Dry_Weight + Fuel_Weight;
     gamma = 1.4;
@@ -8,6 +8,10 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
     MW_air = 28.965;
     %Cp_air_BTUlbmR = (R_BTU_lbmolR/MW_air)*gamma/(gamma-1);
     CP_air_j_kmolK = (R_J_kmolK/MW_air)*gamma/(gamma-1);
+    grav = 9.81; %[m/s^2]
+    drop_height = 12192; %[m]
+    timestep = 1; %[s]
+    cnt = 0;
     while Total_Weight > Fuel_Weight
         %Assume run 1 second iterations, depending on mf_dot will determine
         
@@ -21,7 +25,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         Station0.Pressure_Pa = Inlet.FreestreamPressure_Pa;
         Station0.TotalPressure_Pa = Inlet.FreestreamTotalPressure_Pa;
         Station0.Temperature_K = Inlet.FreestreamTemperature_K;
-        Station0.TotalTemperature_K = Inlet.FreestreamTotalTemperature_K;
+        Station0.TotalTemperature_K = Inlet.FreeStreamTotalTemperature_K;
         Station0.MassFlowRate_kgs = Inlet.MassFlowRate_kgs;
         Station0.Area_m2 = Inlet.EffectiveStreamtubeCapture_m2;
         EnginePerf.Station0 = Station0;
@@ -60,28 +64,45 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         %% Adding Scripting for Nozzle%%
 
         %Calculate Total Thrust from Engine
-        %   Ideal Nozzle
-        %[throat_height, throat_angle, cowl_height, body_width, step_size] = Plug_Nozzle(throat_angle, throat_height, cowl_height, body_width, step_size);
-        [throat_height,throat_angle,cowl_height,body_width,step_size] = Plug_Nozzle(67,0.2,1,1,100);
-        %   Truncated Nozzle
-        %[x,y] = Plug_Nozzle_Style2(AR,eta_b,throat_height);
-        [x,y,local_turn] = Plug_Nozzle_Style2(3.3839,0.05,throat_height,step_size);
+        %   Set Nozzle Geom.
+        if cnt == 0
+            %   Ideal Nozzle
+            %[throat_height, throat_angle, cowl_height, body_width, step_size] = Plug_Nozzle(throat_angle, throat_height, cowl_height, body_width, step_size);
+            [throat_height,throat_angle,cowl_height,body_width,step_size] = Plug_Nozzle(67,0.2,1,1,100);
+            %   Truncated Nozzle
+            %[x,y] = Plug_Nozzle_Style2(AR,eta_b,throat_height);
+            [x,y,local_turn] = Plug_Nozzle_Style2(3.3839,0.05,throat_height,step_size);
+            veloc = Freestreammach;
+            height = drop_height;
+        end
         %   Run Flow_Properties to calculate Thrust Values
         %[Total_Thrust, Total_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit,throat_angle,throat_height,body_width,M_throat,y,x,alpha,DynamicPressure,m_dot,gamma);
-        [Total_Thrust, Total_Lift] = Flow_Properties(step_size,local_turn,1300,2400,1101325,throat_angle,throat_height,body_width,1.15,y,x,3,71820,22.675,1.4);
-
+        [Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,1300,2400,1101325,throat_angle,throat_height,body_width,1.15,y,x,3,71820,22.675,1.4);
+  
         % Calculate Aero Drag Thrust
         %Run Cd_Import Before execution
-        D = DragCoeff(FreestreamMach, 
-
-        %Calculate total Lift
-
-
+        %D = DragCoeff(FreestreamMach, AngleofAttack, phi, NFC, AFC, DynamicPressure, TotalWeight);
+        D = DragCoeff(FreestreamMach, AngleofAttack, 1.0, NFC, AFC, DynamicPressure, Total_Weight);
+        
         %Update Vehicle Weight and Update Flight Values
+        %[total_weight] = actualWeight(full_weight,mdot_f(***need from combustor***),timestep[s])
+        [Total_Weight] = actualWeight(Total_Weight,Station4.MassFlowRate_kgs,timestep);
         
+        %Rocket EQ
+        %F = ma > a = F/m
+        Total_Thrust = Engine_Thrust - D - Total_Weight*grav*sin(AngleofAttack);
+        accel = Total_Thrust/Total_Weight;
+        veloc = veloc + accel;
+        distance = veloc*timestep;
+        xx = distance*cos(AngleofAttack);
+        yy = distance*sin(AngleofAttack);
         
+        %calculate new ambient conditions with new height
+        height = height + yy;
         [T_amb, P_amb, rho] = atmosphere4(height);
         
+        
+        cnt = cnt + 1;
     end
 
 end
