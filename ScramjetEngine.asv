@@ -72,12 +72,9 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
 
         % Calculate Aero Drag Thrust
         %Run Cd_Import Before execution
-        D = DragCoeff(FreestreamMach, AngleofAttack, phi, NFC, AFC, DynamicPressure, TotalWeight);
+        D = DragCoeff(FreestreamMach, 
 
-        %Because we're iterating at a bunch of tiny cruise conditions
-        %approimate Thrust as Thrust - Drag
-        
-        
+        %Calculate total Lift
 
 
         %Update Vehicle Weight and Update Flight Values

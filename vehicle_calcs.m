@@ -19,7 +19,7 @@ clc;
 % 1. GHV - Liston Slides
 
 q = [1000, 1500, 2000]*47.7; %Pa
-Altitude = [0:40:160]*1e3;  %atmosphere fn takes ft. [0 40k, 80k, 120k, 160k]
+%atmosphere fn takes ft., need to update every iteration
 [T,P,Rho,dummy] = atmosphere4(Altitude,1);
 
 T = T'*(5/9);   %K

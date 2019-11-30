@@ -1,18 +1,21 @@
-Function getGHV
-This functions takes the GHV dataset and reports a specific condition
-Inputs include:
-GHVdataset - this is the GHV inlet map in it's imported form already scaled for global size
-Mach - The flight Mach number condition
-AoA - the flight angle of attack relative to the velocity
-Dynamic Pressure - the function will scale from the dynamic pressure in the data set to the flight dynamic pressure specified
-        if SI = 0 then Dynamic Pressure is expected to be lb/ft²
-        if SI = 1 then Dynamic Pressure is expected to be in Pascals or N/m²
-SI_flag - 0 specifies customery English units, 1 specifies SI units
+% Function getGHV
+% This functions takes the GHV dataset and reports a specific condition
+% Inputs include:
+% GHVdataset - this is the GHV inlet map in it's imported form already
+% scaled for global size [how do you make sure the workspace isn't cleared
+% when you run the variable???]
+% Mach - The flight Mach number condition
+% AoA - the flight angle of attack relative to the velocity
+% Dynamic Pressure - the function will scale from the dynamic pressure in the data set to the flight dynamic pressure specified
+%         if SI = 0 then Dynamic Pressure is expected to be lb/ft²
+%         if SI = 1 then Dynamic Pressure is expected to be in Pascals or N/m²
+% SI_flag - 0 specifies customery English units, 1 specifies SI units
 function GHV_Instance = getGHV(GHV_dataset,Mach,AoA,DynamicPressure,SI_flag)
 xq = Mach;
 yq = AoA;
 x = GHV_dataset.x_Mach;
 y = GHV_dataset.y_AoA;
+
 
 %Conversion Constants
 Pa_psi = 6894.8;
