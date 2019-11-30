@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 This is a repository that contains all of the development code for Group
 13 External Ramjet (ERJ) Hypersonic vehicle
 
@@ -13,4 +14,4 @@ Rules:
     d. git checkout -b my-new-feature-branch (this creates a new branch in which you should edit your and others code if needed)
     e. the astrisk will show which branch you have checked out
     f. commit your code (git status>git add>git commit -m "what you updated")
-    g. push your changes to the github repo (git push https://github.com/cturner2036/Hypersonics master)
+=======

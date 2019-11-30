@@ -51,39 +51,38 @@ elseif alpha == 5
     TruncNFC = TruncNFC(6,:);
 end 
  %Mach
- if Mach == 4
-     NCd = TruncNFC.M4;
- elseif Mach > 4 && Mach < 4.5
-     NCd = TruncNFC.M4 + (((Mach - 4)/(4.5-4))*(TruncNFC.M4_5-TruncNFC.M4)); 
- elseif Mach == 4.5
-     NCd = TruncNFC.M4_5;
- elseif Mach > 4.5 && Mach < 5
-     NCd = TruncNFC.M4_5 + (((Mach - 4.5)/(5-4.5))*(TruncNFC.M5-TruncNFC.M4_5)); 
- elseif Mach == 5
-     NCd = TruncNFC.M5;
- elseif Mach > 5 && Mach < 5.5
-     NCd = TruncNFC.M5 + (((Mach - 5)/(5.5-5))*(TruncNFC.M5_5-TruncNFC.M5)); 
- elseif Mach == 5.5
-     NCd = TruncNFC.M5_5;
- elseif Mach > 5.5 && Mach < 6
-     NCd = TruncNFC.M5_5 + (((Mach - 5.5)/(6-5.5))*(TruncNFC.M6-TruncNFC.M5_5)); 
- elseif Mach == 6
-     NCd = TruncNFC.M6;
- elseif Mach > 6 && Mach < 6.5
-     NCd = TruncNFC.M6 + (((Mach - 6)/(6.5-6))*(TruncNFC.M6-TruncNFC.M6_5)); 
- elseif Mach == 6.5
-     NCd = TruncNFC.M6_5;
- elseif Mach > 6.5 && Mach < 7
-     NCd = TruncNFC.M6_5 + (((Mach - 6.5)/(7-6.5))*(TruncNFC.M7-TruncNFC.M6_5)); 
- elseif Mach == 7
-     NCd = TruncNFC.M7;
- end     
+if Mach == 4
+    NCd = TruncNFC.M4;
+elseif Mach > 4 && Mach < 4.5
+    NCd = TruncNFC.M4 + (((Mach - 4)/(4.5-4))*(TruncNFC.M4_5-TruncNFC.M4)); 
+elseif Mach == 4.5
+    NCd = TruncNFC.M4_5;
+elseif Mach > 4.5 && Mach < 5
+    NCd = TruncNFC.M4_5 + (((Mach - 4.5)/(5-4.5))*(TruncNFC.M5-TruncNFC.M4_5)); 
+elseif Mach == 5
+    NCd = TruncNFC.M5;
+elseif Mach > 5 && Mach < 5.5
+    NCd = TruncNFC.M5 + (((Mach - 5)/(5.5-5))*(TruncNFC.M5_5-TruncNFC.M5)); 
+elseif Mach == 5.5
+    NCd = TruncNFC.M5_5;
+elseif Mach > 5.5 && Mach < 6
+    NCd = TruncNFC.M5_5 + (((Mach - 5.5)/(6-5.5))*(TruncNFC.M6-TruncNFC.M5_5)); 
+elseif Mach == 6
+    NCd = TruncNFC.M6;
+elseif Mach > 6 && Mach < 6.5
+    NCd = TruncNFC.M6 + (((Mach - 6)/(6.5-6))*(TruncNFC.M6-TruncNFC.M6_5)); 
+elseif Mach == 6.5
+    NCd = TruncNFC.M6_5;
+elseif Mach > 6.5 && Mach < 7
+    NCd = TruncNFC.M6_5 + (((Mach - 6.5)/(7-6.5))*(TruncNFC.M7-TruncNFC.M6_5)); 
+elseif Mach == 7
+    NCd = TruncNFC.M7;
 end
 
 %Axial Force Coeff.
 %if Phi
 if phi == .5
-    TruncAFC = AFC(1:6,:);
+   TruncAFC = AFC(1:6,:);
 elseif phi == .6
     TruncAFC = AFC(7:12,:);
 elseif phi == .7
@@ -140,11 +139,14 @@ end
      ACd = TruncAFC.M6_5 + (((Mach - 6.5)/(7-6.5))*(TruncAFC.M7-TruncAFC.M6_5)); 
  elseif Mach == 7
      ACd = TruncAFC.M7;
- end     
  end
+
+ 
 
 %Calculate Drag
 Cd = ACd;
 Cl = NCd;
 Lift_to_Drag = Cl/Cd;
 D = weight/Lift_to_Drag;
+
+end
