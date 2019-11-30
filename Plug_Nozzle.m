@@ -1,6 +1,9 @@
 function [throat_height, throat_angle, cowl_height, body_width, step_size] = Plug_Nozzle(throat_angle, throat_height, cowl_height, body_width, step_size)
 % Nozzle Contour, Approximate Method from Characteristic Line
 %clc, clear all, close all
+% Nozzle Contour, Approximate Method from Characteristic Line
+clc, clear all, close all
+
 
 % Read Me %
 % This script calculates a perfectly expanded exhaust stream based
@@ -9,6 +12,7 @@ function [throat_height, throat_angle, cowl_height, body_width, step_size] = Plu
 % nozzle at a specfic length.
 
 % Input Dimensions
+
 %throat_angle = 67;      % Throat Inclination
 %throat_height = 0.2;    % Throat Height
 %cowl_height = 1;        % Cowl Height to Centerline
@@ -16,6 +20,14 @@ function [throat_height, throat_angle, cowl_height, body_width, step_size] = Plu
 % Secondary
 %body_width = 1;         % Body Width
 %step_size = 100;        % Model Fidelity
+
+throat_angle = 67;      % Throat Inclination
+throat_height = 0.2;    % Throat Height
+cowl_height = 1;        % Cowl Height to Centerline
+
+% Secondary
+body_width = 1;         % Body Width
+step_size = 100;        % Model Fidelity
 gamma = 1.4;            % Ratio of Specific Heats
 
 % Set  Matrices
@@ -80,6 +92,7 @@ d_cowl = sqrt( (x(1)-0)^2 + (y(1)-cowl_height)^2 );
 cout = ['Perfect Expansion Ramp Study. Expansion Ratio is: ',num2str(AR),...
     '. Exit Mach is: ' ,num2str(M_exit),'. Only Ramp Height is: ', num2str(y_height),...
     '. Total Length is: ',num2str(x_length),'.'];
+
 %disp(cout)
 
 % figure (1)
@@ -90,4 +103,14 @@ cout = ['Perfect Expansion Ramp Study. Expansion Ratio is: ',num2str(AR),...
 % ylabel('Nozzle Height')
 % grid on
 % axis equal
- 
+
+disp(cout)
+
+figure (1)
+plot(x,y)
+hold on
+plot(-x_hold,-1*(cowl_height-y_hold),'o')
+xlabel('Nozzle Length')
+ylabel('Nozzle Height')
+grid on
+axis equal

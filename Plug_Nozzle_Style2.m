@@ -8,13 +8,6 @@ function [x,y,local_turn] = Plug_Nozzle_Style2(AR, eta_b, throat_height, step_si
 % obtained from the Approximate Method and the throat height. This will
 % feed into the flow properties script to calculate thrust and lift.
 
-% Set Inputs
-%AR = 3.3839;                     % Expasion Area Ratio (Effective Angle)
-%eta_b = 0.1;                    % Truncation Parameter (0=PerfectExpansion)
-%throat_height = 0.2;             % Throat Height
-
-% Secondary
-%step_size = 100;                 % Model Fidelity
 gamma = 1.4;                     % Ratio Specific Heats
 exit_height = AR*throat_height;  % Exit Height
 
@@ -132,15 +125,3 @@ for i = 1:n
 end
 
 local_turn = flip(turn_steps);
-
-% figure(1)
-% plot(x,y)
-% hold on
-% plot(xnew,ynew,'o')
-% xlabel('Nozzle Length')
-% ylabel('Nozzle Height')
-% grid on
-% axis equal
-
-
-
