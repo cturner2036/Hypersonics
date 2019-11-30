@@ -1,3 +1,4 @@
+function [Total_Thrust, Total_Lift] = Flow_Properties(step_size,P_amb,T_exit,Pt_exit,throat_angle,body_width,M_throat,y,x,alpha,Q,m_dot,gamma);
 % Read Me %
 % This script takes the x,y contour data from the contour scripts, along
 % with the throat angle, throat area, local turn, step size, and body
@@ -6,25 +7,25 @@
 
 %% Inputs (Arbitrary)
 % Exit Flow Properties
-M_throat = 1.15;    % Throat Mach
-mdot = 50/2.205;    % Mass Flow Rate (kg/s)
-R = 287;            % Specific Gas Constant (J/kg-K)
-gamma = 1.4;        % Ratio Specific Heats
-Q = 1500*47.88;     % Dynamic Pressure (Pa)
-alpha = 3;          % Angle of Attack
+%M_throat = 1.15;    % Throat Mach
+%mdot = 50/2.205;    % Mass Flow Rate (kg/s)
+%R = 287;            % Specific Gas Constant (J/kg-K)
+%gamma = 1.4;        % Ratio Specific Heats
+%Q = 1500*47.88;     % Dynamic Pressure (Pa)
+%alpha = 3;          % Angle of Attack
 
 % Importanat, will change with altitude!!!!
-P_amb = 1300;     % Ambient-Inf Pressure (Pa)
+%P_amb = 1300;     % Ambient-Inf Pressure (Pa)
 
 % Static and Stagnation, Temperature and Pressure (K and Pa)
-T_exit = 2400;      
+%T_exit = 2400;      
 Tt_exit = T_exit*(1 + (gamma-1)/2*M_throat^2);
-Pt_exit = 1101325;
+%Pt_exit = 1101325;
 P_exit = Pt_exit*(1 + (gamma-1)/2*M_throat^2)^(-gamma/(gamma-1));
 
 % Also requires: throat_angle, throat_area, local_turn, step_size, body_width
-body_width = 1;
-throat_angle = 45;
+%body_width = 1;
+%throat_angle = 45;
 throat_area = throat_height*body_width;
 
 %-----------------------------------------------------------%
@@ -59,18 +60,18 @@ v_exit = M_throat*a;
 %% Calcualtes Mach Loop
 % Required if exit Mach != 1
 for i = 1:step_size-1
-    
+
     % P-M Relations for v(M1)
     pm1 = sqrt((gamma+1)/(gamma-1));
     pm2 = (gamma-1)/(gamma+1);
     pm3 = Mach_Numbers(i)^2-1;           
     v1 = pm1*atand(sqrt(pm2*pm3))-atand(sqrt(pm3));
-    
+
     % Local Turn Angle
     % Theta = v(M2) - v(M1)
     Theta = local_turn(i) - local_turn(i+1);
     v2 = v1 + Theta;
-    
+
     % P-M Relations for Mach after Isentropic Turn
     Mach_Numbers(i+1)=0;
     dummy_angle = 0;
@@ -82,51 +83,51 @@ for i = 1:step_size-1
         Mach_Numbers(i+1) = Mach_Numbers(i+1) + 0.00001;
         % Provides three decimal place accuracy comparable w/ online calculators
     end
-    
+
 end
 
 
 %% Flow Properties Loop
 % Assuming Isentropic Expansion, Adiabatic Wall
 for i = 1:step_size-1
-    
+
     % Isentropic Relations
     TopVal = 1 + (gamma-1)/2*Mach_Numbers(i)^2;
     BotVal = 1 + (gamma-1)/2*Mach_Numbers(i+1)^2;
     exp1 = gamma/(gamma-1);
-    
+
     % Static Pressure
     Static_Pressure(i+1) = Static_Pressure(i)*(TopVal/BotVal)^(exp1);
-    
+
     % Stagnation Pressure
     Stagnation_Pressure(i+1) = Static_Pressure(i+1)*TopVal^(exp1);
-    
+
     % Static Temperature
     Static_Temperature(i+1) = Static_Temperature(i)*(TopVal/BotVal);
-    
+
     % Stagnation Temperature
     Stagnation_Temperature(i+1) = Static_Temperature(i+1)*(TopVal);
-    
+
 end 
 
 %% Centerbody Coefficient Loop
 for i = 1:step_size
-    
+
     % Pressure Coefficinent
     Cof_Pressure(i) = (Static_Pressure(i)-P_amb)/Q;
 
     % Axial Force Coefficient
     Cof_AxialForce(i) = Cof_Pressure(i)*sind(local_turn(i));
-    
+
     % Normal Force Coefficient
     Cof_NormalForce(i) = Cof_Pressure(i)*cosd(local_turn(i));
-    
+
     % Lift Coefficient
     Cof_Lift(i) = Cof_NormalForce(i)*cosd(alpha) + Cof_AxialForce(i)*sind(alpha);
-    
+
     % Thrust Coefficient
     Cof_Thrust(i) = Cof_AxialForce(i)*cosd(alpha) - Cof_NormalForce(i)*sind(alpha);
-    
+
 end
 
 %% Calculate Thrust and Lift Components
@@ -143,7 +144,7 @@ T_pressure = 0;
 T_pressure2  = 0;
 % Centerbody Thrust
 for i = 1:step_size-1
-       
+
     % First Method
     % Axial Cross Sectional Slice
     dAy = body_width*abs( y(i)-y(i+1) );
@@ -169,68 +170,64 @@ for i = 1:step_size-1
 end
 
 % Combined Thrust and Lift Term (kN)
-Total_Thrust = (T_pressure + T_jet + T_base)/1000
-Total_Lift = (L_pressure - L_jet + L_base)/1000
+Total_Thrust = (T_pressure + T_jet + T_base)/1000;
+Total_Lift = (L_pressure - L_jet + L_base)/1000;
 
 
 %% Center of Pressure - Centerbody
 % Numerically Integrate S x*P dx
-xPx = trapz(x,x.*Static_Pressure);
+%xPx = trapz(x,x.*Static_Pressure);
 % Numerically Integrate S P dx
-Px = trapz(x,Static_Pressure);
+%Px = trapz(x,Static_Pressure);
 % Find Center of Pressure, Useful for Moment Calculation
-CoPx = xPx./Px;
+%CoPx = xPx./Px;
 
 %% Calculate Volume of Nozzle
-Area = trapz(x,y);
-Volume = Area*body_width;
+%Area = trapz(x,y);
+%Volume = Area*body_width;
 
-figure (2)
-plot(x,Static_Pressure)
-hold on
-plot(x,Stagnation_Pressure)
-hold off
-xlabel('Axial Distance')
-ylabel('Pressure (Pa)')
-legend("Static Pressure","Stagnation Pressure")
-grid on
-
-figure (3)
-plot(x,Static_Temperature)
-hold on
-plot(x,Stagnation_Temperature)
-hold off
-xlabel('Axial Distance')
-ylabel('Temperature (K)')
-legend("Static Temperature","Stagnation Temperature")
-grid on
-
-figure (4)
-plot(x,Cof_NormalForce)
-hold on
-plot(x,Cof_AxialForce)
-hold off
-xlabel('Axial Distance')
-ylabel('Force Coefficients')
-legend("Normal Force Coefficient","Axial Force Coefficinet")
-grid on
-
-figure (5)
-plot(x,Cof_Lift)
-hold on
-plot(x,Cof_Thrust)
-hold off
-xlabel('Axial Distance')
-ylabel('Force Coefficients')
-legend("Lift Coefficient","Thrust Coefficinet")
-grid on
-
-figure (6)
-plot(x,mach_numbers)
-xlabel('Axial Distance')
-ylabel('Mach Numbers')
-grid on
-
-
-
-
+% figure (2)
+% plot(x,Static_Pressure)
+% hold on
+% plot(x,Stagnation_Pressure)
+% hold off
+% xlabel('Axial Distance')
+% ylabel('Pressure (Pa)')
+% legend("Static Pressure","Stagnation Pressure")
+% grid on
+% 
+% figure (3)
+% plot(x,Static_Temperature)
+% hold on
+% plot(x,Stagnation_Temperature)
+% hold off
+% xlabel('Axial Distance')
+% ylabel('Temperature (K)')
+% legend("Static Temperature","Stagnation Temperature")
+% grid on
+% 
+% figure (4)
+% plot(x,Cof_NormalForce)
+% hold on
+% plot(x,Cof_AxialForce)
+% hold off
+% xlabel('Axial Distance')
+% ylabel('Force Coefficients')
+% legend("Normal Force Coefficient","Axial Force Coefficinet")
+% grid on
+% 
+% figure (5)
+% plot(x,Cof_Lift)
+% hold on
+% plot(x,Cof_Thrust)
+% hold off
+% xlabel('Axial Distance')
+% ylabel('Force Coefficients')
+% legend("Lift Coefficient","Thrust Coefficinet")
+% grid on
+% 
+% figure (6)
+% plot(x,mach_numbers)
+% xlabel('Axial Distance')
+% ylabel('Mach Numbers')
+% grid on
