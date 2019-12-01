@@ -33,8 +33,8 @@ Cd_Import;
 Q = 1500;   %initial Q
 FreeMach = 4.0;
 AngleofAttack = 0.0;
-Dry_Weight = 5051.142/.453592;  %[kgs]
-Fuel_Weight = 3141.649/.453592; %[kgs]
+Dry_Weight = 5051.142*.453592;  %[kgs]
+Fuel_Weight = 3141.649*.453592; %[kgs]
 SI_Flag = 1;
 
 %Initiate Mission
