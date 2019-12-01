@@ -99,8 +99,8 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         accel = (Total_Thrust*1000)/Total_Weight;
         veloc = veloc + accel*timestep;
         distance = veloc*timestep;
-        xx(i) = distance*cos(AngleofAttack) + xx(cnt);
-        yy(i) = distance*sin(AngleofAttack) + yy(cnt);
+        xx(i) = distance*cosd(AngleofAttack) + xx(cnt);
+        yy(i) = distance*sind(AngleofAttack) + yy(cnt);
         
         %calculate new ambient conditions with new height
         height = height + (yy(i)-yy(cnt));
