@@ -106,7 +106,7 @@ elseif alpha == -2
 elseif alpha == 0
     TruncAFC = TruncAFC(3,:);
 elseif alpha == 2
-    TruncNFC = TruncNFC(4,:);
+    TruncAFC = TruncAFC(4,:);
 elseif alpha == 4
     TruncAFC = TruncAFC(5,:);
 elseif alpha == 5
