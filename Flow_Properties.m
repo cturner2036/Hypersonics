@@ -59,32 +59,32 @@ v_exit = M_throat*a;
 
 %% Calcualtes Mach Loop
 % Required if exit Mach != 1
-if M_throat > 1
-    for i = 1:step_size-1
-        % P-M Relations for v(M1)
+for i = 1:step_size-1
+
+    % P-M Relations for v(M1)
+    pm1 = sqrt((gamma+1)/(gamma-1));
+    pm2 = (gamma-1)/(gamma+1);
+    pm3 = Mach_Numbers(i)^2-1;           
+    v1 = pm1*atand(sqrt(pm2*pm3))-atand(sqrt(pm3));
+
+    % Local Turn Angle
+    % Theta = v(M2) - v(M1)
+    Theta = local_turn(i) - local_turn(i+1);
+    v2 = v1 + Theta;
+
+    % P-M Relations for Mach after Isentropic Turn
+    %Mach_Numbers(i+1)=0;
+    Mach_Numbers(i+1)=Machnumbers(i); % Assumes a supersonic nozzle.  M(i+1) > M(i)
+    dummy_angle = 0;
+    while (dummy_angle < v2)
         pm1 = sqrt((gamma+1)/(gamma-1));
         pm2 = (gamma-1)/(gamma+1);
-        pm3 = Mach_Numbers(i)^2-1;
-        v1 = pm1*atand(sqrt(pm2*pm3))-atand(sqrt(pm3));
-        % Local Turn Angle
-        % Theta = v(M2) - v(M1)
-        Theta = local_turn(i) - local_turn(i+1);
-        v2 = v1 + Theta;
-        % P-M Relations for Mach after Isentropic Turn
-        Mach_Numbers(i+1)=0;
-        dummy_angle = 0;
-        while (dummy_angle < v2)
-            pm1 = sqrt((gamma+1)/(gamma-1));
-            pm2 = (gamma-1)/(gamma+1);
-            pm3 = Mach_Numbers(i+1)^2-1;
-            dummy_angle = pm1*atand(sqrt(pm2*pm3))-atand(sqrt(pm3));
-            Mach_Numbers(i+1) = Mach_Numbers(i+1) + 0.00001;
-            % Provides three decimal place accuracy comparable w/ online calculators
-        end
+        pm3 = Mach_Numbers(i+1)^2-1;           
+        dummy_angle = pm1*atand(sqrt(pm2*pm3))-atand(sqrt(pm3));
+        Mach_Numbers(i+1) = Mach_Numbers(i+1) + 0.00001;
+        % Provides three decimal place accuracy comparable w/ online calculators
     end
-end
-if M_throat == 1
-    Mach_Numbers = mach_numbers;
+
 end
 
 
@@ -175,3 +175,60 @@ Engine_Thrust = (T_pressure + T_jet + T_base)/1000;
 Engine_Lift = (L_pressure - L_jet + L_base)/1000;
 
 
+%% Center of Pressure - Centerbody
+% Numerically Integrate S x*P dx
+%xPx = trapz(x,x.*Static_Pressure);
+% Numerically Integrate S P dx
+%Px = trapz(x,Static_Pressure);
+% Find Center of Pressure, Useful for Moment Calculation
+%CoPx = xPx./Px;
+
+%% Calculate Volume of Nozzle
+%Area = trapz(x,y);
+%Volume = Area*body_width;
+
+% figure (2)
+% plot(x,Static_Pressure)
+% hold on
+% plot(x,Stagnation_Pressure)
+% hold off
+% xlabel('Axial Distance')
+% ylabel('Pressure (Pa)')
+% legend("Static Pressure","Stagnation Pressure")
+% grid on
+% 
+% figure (3)
+% plot(x,Static_Temperature)
+% hold on
+% plot(x,Stagnation_Temperature)
+% hold off
+% xlabel('Axial Distance')
+% ylabel('Temperature (K)')
+% legend("Static Temperature","Stagnation Temperature")
+% grid on
+% 
+% figure (4)
+% plot(x,Cof_NormalForce)
+% hold on
+% plot(x,Cof_AxialForce)
+% hold off
+% xlabel('Axial Distance')
+% ylabel('Force Coefficients')
+% legend("Normal Force Coefficient","Axial Force Coefficinet")
+% grid on
+% 
+% figure (5)
+% plot(x,Cof_Lift)
+% hold on
+% plot(x,Cof_Thrust)
+% hold off
+% xlabel('Axial Distance')
+% ylabel('Force Coefficients')
+% legend("Lift Coefficient","Thrust Coefficinet")
+% grid on
+% 
+% figure (6)
+% plot(x,mach_numbers)
+% xlabel('Axial Distance')
+% ylabel('Mach Numbers')
+% grid on
