@@ -74,15 +74,15 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
             %[throat_height, throat_angle, cowl_height, body_width, step_size] = Plug_Nozzle(throat_angle, throat_height, cowl_height, body_width, step_size);
             [throat_height,throat_angle,cowl_height,body_width,step_size] = Plug_Nozzle(67,0.2,1,1,100);
             %   Truncated Nozzle
-            %[x,y] = Plug_Nozzle_Style2(AR,eta_b,throat_height);
+            %[x,y] = Plug_Nozzle_Style2(AR,eta_b,throat_height,step_size);
             [x,y,local_turn] = Plug_Nozzle_Style2(3.3839,0.05,throat_height,step_size);
             spd_snd = sqrt(gamma*R_J_kmolK*Station0.Temperature_K);
             veloc = FreestreamMach*spd_snd;
             height = drop_height;
         end
         %   Run Flow_Properties to calculate Thrust Values
-        %[Total_Thrust, Total_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit,throat_angle,throat_height,body_width,M_throat,y,x,alpha,DynamicPressure,m_dot,gamma);
-        [Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.Pressure_Pa,throat_angle,throat_height,body_width,1.15,y,x,3,71820,22.675,1.4);
+        %[Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit,throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
+        [Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.Pressure_Pa,throat_angle,throat_height,body_width,1.15,y,x,AngleofAttack,71820,22.675,1.4);
   
         % Calculate Aero Drag Thrust
         %Run Cd_Import Before execution
@@ -95,7 +95,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         
         %Rocket EQ
         %F = ma > a = F/m
-        Total_Thrust = Engine_Thrust - D - Total_Weight*grav*sin(AngleofAttack);
+        Total_Thrust = Engine_Thrust - D - (Total_Weight*grav*sind(AngleofAttack))/1000;
         accel = (Total_Thrust*1000)/Total_Weight;
         veloc = veloc + accel*timestep;
         distance = veloc*timestep;
