@@ -71,7 +71,8 @@ if M_throat > 1
         Theta = local_turn(i) - local_turn(i+1);
         v2 = v1 + Theta;
         % P-M Relations for Mach after Isentropic Turn
-        Mach_Numbers(i+1)=0;
+        %Mach_Numbers(i+1)=0;
+        Mach_Numbers(i+1)=Mach_Numbers(i); % Assumes expanding Supersonic nozzle where M(i+1)>M(i) (JM)
         dummy_angle = 0;
         while (dummy_angle < v2)
             pm1 = sqrt((gamma+1)/(gamma-1));
