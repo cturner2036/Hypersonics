@@ -32,10 +32,11 @@ Cd_Import;
 %Initial Conditions
 Q = 1500;   %initial Q
 FreeMach = 4.0;
-AngleofAttack = 2.0;
+AngleofAttack = 0.0;
 Dry_Weight = 5051.142*.453592;  %[kgs]
 Fuel_Weight = 3141.649*.453592; %[kgs]
-SI_Flag = 1;
+FP_Angle = 2;
+SI_Flag = 0;
 
 %Initiate Mission
-EnginePerf = ScramjetEngine(GHVData,Q,FreeMach,AngleofAttack,Dry_Weight,Fuel_Weight,SI_Flag,AFC,NFC);
+EnginePerf = ScramjetEngine(GHVData,Q,FreeMach,AngleofAttack,Dry_Weight,Fuel_Weight,SI_Flag,AFC,NFC,FP_Angle);

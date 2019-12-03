@@ -1,4 +1,4 @@
-function [Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit,throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
+function [Engine_Thrust, Engine_Lift, Final_Stag_Temperature] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit,throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
 % Read Me %
 % This script takes the x,y contour data from the contour scripts, along
 % with the throat angle, throat area, local turn, step size, and body
@@ -111,6 +111,8 @@ for i = 1:step_size-1
     Stagnation_Temperature(i+1) = Static_Temperature(i+1)*(TopVal);
 
 end 
+
+Final_Stag_Temperature = Stagnation_Temperature(step_size);
 
 %% Centerbody Coefficient Loop
 for i = 1:step_size

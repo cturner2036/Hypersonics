@@ -1,4 +1,4 @@
-function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,AngleofAttack,Dry_Weight,Fuel_Weight,SI_Flag,AFC,NFC)
+function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,AngleofAttack,Dry_Weight,Fuel_Weight,SI_Flag,AFC,NFC,FP_Angle)
     %Constants
     Total_Weight = Dry_Weight + Fuel_Weight;
     gamma = 1.4;
@@ -13,6 +13,8 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
     [T_amb, P_amb, rho] = atmosphere4(drop_height,0);
     xx(1) = 0;
     yy(1) = 12192;
+    MM(1) = FreeMach;
+    Isp(1) = 3000;
     timestep = 1; %[s]
     cnt = 1;
     i = 2;
@@ -82,7 +84,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         end
         %   Run Flow_Properties to calculate Thrust Values
         %[Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit,throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
-        [Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.Pressure_Pa,throat_angle,throat_height,body_width,1.15,y,x,3,71820,22.675,1.4);
+        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.Pressure_Pa,throat_angle,throat_height,body_width,1.15,y,x,AngleofAttack,71820,22.675,1.4);
   
         % Calculate Aero Drag Thrust
         %Run Cd_Import Before execution
@@ -94,13 +96,17 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         [Total_Weight] = actualWeight(Total_Weight,Station4.MassFlowRate_kgs,timestep);
         
         %Rocket EQ
-        %F = ma > a = F/m
-        Total_Thrust = Engine_Thrust - D - Total_Weight*grav*sin(AngleofAttack);
+        %F = ma > a = F/m   %%% Change AngleofAttack to Pitch
+        Engine_Total_Thrust = (Engine_Thrust*1000 + Inlet.InletAxialForce_N - Station2.MassFlowRate_kgs*Station2.Velocity_ms);
+        %Isp should be around 1000-2000
+        Isp(i) = Engine_Total_Thrust/((Station4.MassFlowRate_kgs-Station2.MassFlowRate_kgs)*grav);
+        Total_Thrust = (Engine_Total_Thrust/1000) - D - (Total_Weight*grav*sind(FP_Angle))/1000;
         accel = (Total_Thrust*1000)/Total_Weight;
         veloc = veloc + accel*timestep;
         distance = veloc*timestep;
-        xx(i) = distance*cos(AngleofAttack) + xx(cnt);
-        yy(i) = distance*sin(AngleofAttack) + yy(cnt);
+        xx(i) = distance*cosd(FP_Angle) + xx(cnt);
+        yy(i) = distance*sind(FP_Angle) + yy(cnt);
+        MM(i) = FreestreamMach;
         
         %calculate new ambient conditions with new height
         height = height + (yy(i)-yy(cnt));
@@ -111,7 +117,9 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         i = i + 1
     end
 
-   plot(xx,yy) 
+   plot(xx,yy)
+   plot(i,MM)
+   plot
     
 end
 
