@@ -1,4 +1,4 @@
-function [D, L] = DragCoeff(Mach,alpha,phi,NFC,AFC,q,weight)
+function [D] = DragCoeff(Mach,alpha,phi,NFC,AFC,q,weight)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Variables:
 % - Mach: Mach number of the vehicle
@@ -142,7 +142,7 @@ end
  elseif Mach == 7
      ACd = TruncAFC.M7;
  elseif Mach > 7
-     ACd = TruncAFC.M7 + TruncAFC.M7*((TruncAFC.M7-TruncAFC.M6_5)/TruncAFC.M7);
+     ACd = TruncNFC.M7 + TruncNFC.M7*((TruncNFC.M7-TruncNFC.M6_5)/TruncNFC.M7);
 
  end
 
@@ -152,7 +152,7 @@ end
 Cd = ACd;
 Cl = NCd;
 Lift_to_Drag = Cl/Cd;
-D = (Cd*19.4567*(q*47.88))/1000; %[kN]
-L = (Cl*19.4567*(q*47.88))/1000;
+
+D = (weight/Lift_to_Drag)/1000; %[kN]
 
 end

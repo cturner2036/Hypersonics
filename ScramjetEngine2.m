@@ -105,7 +105,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         Isp(i) = Engine_Total_Thrust/(mdot_ff(i)*grav);
         Total_Thrust = (Engine_Total_Thrust/1000) - D - (Total_Weight*grav*sind(FP_Angle))/1000;
         accel = (Total_Thrust*1000)/Total_Weight;
-        accel_y = (L - (Total_Weight*grav*cosd(FP_Angle))/1000)/Total_Weight;
+        accel_y = (L - (Total_Weight*grav*cosd(FP_Angle)))/Total_Weight;
         veloc = veloc + accel*timestep;
         distance = veloc*timestep;
         xx(i) = distance*cosd(FP_Angle) + xx(cnt);
@@ -217,7 +217,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         %Bottom Right Plot
         ax1y3 = nexttile(11);
         plot(ax1y3,dd,accel_y)
-        title("Acceleration Curve")
+        title("Acceleration Curve Y - dir")
         xlabel("iter")
         ylabel("Acceleration (m/s^2)")
         
