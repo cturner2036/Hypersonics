@@ -78,7 +78,7 @@ elseif Mach > 6.5 && Mach < 7
 elseif Mach == 7
     NCd = TruncNFC.M7;
 elseif Mach > 7
-    NCd = TruncNFC.M7 + TruncNFC.M7*((TruncNFC.M7-TruncNFC.M6_5)/TruncNFC.M7);
+    NCd = 0.1878931001*Mach^-1.0590325161;
 end
 
 %Axial Force Coeff.
@@ -142,8 +142,7 @@ end
  elseif Mach == 7
      ACd = TruncAFC.M7;
  elseif Mach > 7
-     ACd = TruncAFC.M7 + TruncAFC.M7*((TruncAFC.M7-TruncAFC.M6_5)/TruncAFC.M7);
-
+     ACd = 0.0152943657*Mach^(-0.3371088887);
  end
 
  
