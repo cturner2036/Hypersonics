@@ -2,8 +2,6 @@ function [throat_height, throat_angle, cowl_height, body_width, step_size] = Plu
 % Nozzle Contour, Approximate Method from Characteristic Line
 %clc, clear all, close all
 % Nozzle Contour, Approximate Method from Characteristic Line
-clc, clear all, close all
-
 
 % Read Me %
 % This script calculates a perfectly expanded exhaust stream based
@@ -21,14 +19,14 @@ clc, clear all, close all
 %body_width = 1;         % Body Width
 %step_size = 100;        % Model Fidelity
 
-throat_angle = 67;      % Throat Inclination
-throat_height = 0.2;    % Throat Height
-cowl_height = 1;        % Cowl Height to Centerline
-
-% Secondary
-body_width = 1;         % Body Width
-step_size = 100;        % Model Fidelity
-gamma = 1.4;            % Ratio of Specific Heats
+% throat_angle = 67;      % Throat Inclination
+% throat_height = ;    % Throat Height
+% cowl_height = 1;        % Cowl Height to Centerline
+% 
+% % Secondary
+% body_width = 1;         % Body Width
+% step_size = 100;        % Model Fidelity
+gamma = 1.3;            % Ratio of Specific Heats
 
 % Set  Matrices
 x = zeros(1,step_size);

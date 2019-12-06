@@ -14,6 +14,8 @@
 % -SI_Flag > switches between SI and English units (0 or 1)
 % [Need to have '3X GHV Inlet Map-1.xlsx' & 'Cd_ss.xlsx' spreadsheets in
 % WD]
+
+
 %Required Functions:
 %[ScramjetEngine, getGHV, Station, Plug_Nozzle, Plug_Nozzle_Style2,
 %Flow_Properties, DragCoeff, atmosphere, actualWeight]
@@ -35,7 +37,7 @@ FreeMach = 4.0;
 AngleofAttack = 0.0;
 Dry_Weight = 5051.142*.453592;  %[kgs]
 Fuel_Weight = 3141.649*.453592; %[kgs]
-FP_Angle = 2;
+FP_Angle = 0;
 SI_Flag = 0;
 
 %Initiate Mission

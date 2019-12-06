@@ -57,9 +57,9 @@ Base_area = Base_height*body_width;
 a = sqrt(gamma*R*T_exit);
 v_exit = M_throat*a;
 
-%% Calcualtes Mach Loop
+%% Calculates Mach Loop
 % Required if exit Mach != 1
-if M_throat > 1
+if M_throat >=1
     for i = 1:step_size-1
         % P-M Relations for v(M1)
         pm1 = sqrt((gamma+1)/(gamma-1));
@@ -83,9 +83,6 @@ if M_throat > 1
             % Provides three decimal place accuracy comparable w/ online calculators
         end
     end
-end
-if M_throat == 1
-    Mach_Numbers = mach_numbers;
 end
 
 
@@ -174,7 +171,7 @@ for i = 1:step_size-1
 end
 
 % Combined Thrust and Lift Term (kN)
-Engine_Thrust = (T_pressure + T_jet + T_base)/1000;
+Engine_Thrust = (  + T_jet + T_base)/1000;
 Engine_Lift = (L_pressure - L_jet + L_base)/1000;
 
 

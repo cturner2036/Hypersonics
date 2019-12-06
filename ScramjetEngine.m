@@ -1,3 +1,4 @@
+
 function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,AngleofAttack,Dry_Weight,Fuel_Weight,SI_Flag,AFC,NFC,FP_Angle)
     %Constants
     Total_Weight = Dry_Weight + Fuel_Weight;
@@ -9,10 +10,12 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
     %Cp_air_BTUlbmR = (R_BTU_lbmolR/MW_air)*gamma/(gamma-1);
     CP_air_j_kmolK = (R_J_kmolK/MW_air)*gamma/(gamma-1);
     grav = 9.81; %[m/s^2]
-    drop_height = 12192; %[m]
+    drop_height = 62510; %[ft]
     [T_amb, P_amb, rho] = atmosphere4(drop_height,0);
+    P_amb = P_amb*47.88;
+    T_amb = T_amb/1.8;
     xx(1) = 0;
-    yy(1) = 12192;
+    yy(1) = drop_height/3.281;
     MM(1) = FreestreamMach;
     Isp(1) = 3000;
     timestep = 1; %[s]
@@ -74,17 +77,17 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         if cnt == 1
             %   Ideal Nozzle
             %[throat_height, throat_angle, cowl_height, body_width, step_size] = Plug_Nozzle(throat_angle, throat_height, cowl_height, body_width, step_size);
-            [throat_height,throat_angle,cowl_height,body_width,step_size] = Plug_Nozzle(67,0.2,1,1,100);
+            [throat_height,throat_angle,cowl_height,body_width,step_size] = Plug_Nozzle(30,0.163,1,1,100);
             %   Truncated Nozzle
             %[x,y] = Plug_Nozzle_Style2(AR,eta_b,throat_height,step_size);
-            [x,y,local_turn] = Plug_Nozzle_Style2(3.3839,0.05,throat_height,step_size);
-            spd_snd = sqrt(gamma*R_J_kmolK*Station0.Temperature_K);
+            [x,y,local_turn] = Plug_Nozzle_Style2(1.8608,0.05,throat_height,step_size);
+            spd_snd = sqrt(gamma*R_J_kmolK/MW_air*Station0.Temperature_K);
             veloc = FreestreamMach*spd_snd;
             height = drop_height;
         end
         %   Run Flow_Properties to calculate Thrust Values
         %[Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit(Station4.TotalPressure_Pa),throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
-        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,throat_height,body_width,1.15,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.4);
+        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,throat_height,body_width,1,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.3);
   
         % Calculate Aero Drag Thrust
         %Run Cd_Import Before execution
@@ -100,22 +103,27 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         
         %Rocket EQ
         %F = ma > a = F/m   %%% Change AngleofAttack to Pitch
-        Engine_Total_Thrust = (Engine_Thrust*1000 + Inlet.InletAxialForce_N - Station2.MassFlowRate_kgs*Station2.Velocity_ms);
+        Engine_Total_Thrust = (Engine_Thrust*1000 + Inlet.InletAxialForce_N - Station2.MassFlowRate_kgs*Station0.Velocity_ms);
         %Isp should be around 1000-2000
         Isp(i) = Engine_Total_Thrust/(mdot_ff(i)*grav);
-        Total_Thrust = (Engine_Total_Thrust/1000) - D - (Total_Weight*grav*sind(FP_Angle))/1000;
-        accel = (Total_Thrust*1000)/Total_Weight;
-        accel_y = (L - (Total_Weight*grav*cosd(FP_Angle)))/Total_Weight;
+        Total_Thrust(i) = (Engine_Total_Thrust/1000) - D - (Total_Weight*grav*sind(FP_Angle))/1000;
+        accel_x = ((Engine_Total_Thrust/1000 - D)*cosd(FP_Angle) - (L+Engine_Lift)*sind(FP_Angle))*1000/Total_Weight;
+        accel_y = ((Engine_Total_Thrust/1000 - D)*sind(FP_Angle) + (L+Engine_Lift)*cosd(FP_Angle) - (Total_Weight*grav)/1000)*1000/Total_Weight;
+        accel = sqrt(accel_x^2 + accel_y^2);
+        Lift(i) = L + Engine_Lift;
         veloc = veloc + accel*timestep;
         distance = veloc*timestep;
         xx(i) = distance*cosd(FP_Angle) + xx(cnt);
-        yy(i) = distance*sind(FP_Angle) + yy(cnt);
         MM(i) = FreestreamMach;
         
         
         %calculate new ambient conditions with new height
-        height = height + (yy(i)-yy(cnt));
-        height_ft = height*3.281;
+        FreestreamMach = veloc/spd_snd;
+        [T, P, rho,hgeom] = AtmosQM(1500,FreestreamMach);
+        yy(i) = hgeom/3.281;
+        FP_Angle = tand( (yy(i) - yy(i-1))/(xx(i) - xx(i-1)));
+        height = hgeom;
+        height_ft = height;
         [T_amb, P_amb, rho] = atmosphere4(height_ft,0);
         P_amb = P_amb*47.88;
         P_amb_plot(i) = P_amb;
@@ -123,20 +131,20 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         St2_P(i) = Station2.TotalPressure_Pa;
         accel_p(i) = accel;
         accely_p(i) = accel_y;
-        spd_snd = sqrt(gamma*R_J_kmolK*Station0.Temperature_K);
-        FreestreamMach = veloc/spd_snd;
+        spd_snd = sqrt(gamma*R_J_kmolK/MW_air*Station0.Temperature_K);
         cnt = cnt + 1;
+        if mdot_ff(i)==0
+            helpme = true; 
+        end
         i = i + 1
-        
         %%%%%% Plotting Stuff %%%%%%%%%%%%%%%
         dd = linspace(0,i,i-1);
-        tiledlayout(3,4);
         %h = figure;
         
         %Top Left Plot
-        ax1y1 = nexttile;
-        plot(ax1y1,xx,yy)
-        title(ax1y1,["Distance (m), Flight Angle:" + num2str(FP_Angle)])
+        subplot(3,4,1);
+        plot(xx,yy)
+        title(["Distance (m), Flight Angle:" + num2str(FP_Angle)])
         xlabel('Distance (m)')
         ylabel("height (m)")
         %xlim([0 6*10^6])
@@ -144,8 +152,8 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         grid on
         
         %Top Right Plot
-        ax2y1 = nexttile(2);
-        plot(ax2y1,dd,MM)
+        subplot(3,4,2)
+        plot(dd,MM)
         title("Mach # vs time")
         ylabel('Mach #')
         xlabel('iterations')
@@ -153,8 +161,8 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         %ylim([4 8])
         
         %Middle Left Plot
-        ax1y2 = nexttile(3);
-        plot(ax1y2,dd,Isp)
+        subplot(3,4,3)
+        plot(dd,Isp)
         title("Isp vs. Iterations")
         xlabel("iterations")
         ylabel("Specific Thrust (Isp)")
@@ -162,8 +170,8 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         %ylim([2500 8100])
         
         %Middle Right Plot
-        ax2y2 = nexttile(4);
-        plot(ax2y2,dd,mdot_ff)
+        subplot(3,4,4)
+        plot(dd,mdot_ff)
         title("fuel mass flow vs. iterations")
         xlabel("iterations")
         ylabel("fuel mass flow")
@@ -171,8 +179,8 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         %ylim([0 2])
         
         %Bottom Left Plot
-        ax1y3 = nexttile(5);
-        plot(ax1y3,dd,Vehicle_Weight)
+        subplot(3,4,5)
+        plot(dd,Vehicle_Weight)
         title("Vehicle Weight vs. Iterations")
         xlabel("iterations")
         ylabel("weight [kgs]")
@@ -180,46 +188,52 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         %ylim([2300 3900])
         
         %Bottom Right Plot
-        ax2y3 = nexttile(6);
-        plot(ax2y3,MM,Drag)
-        title("Drag Coeff vs. M#")
+        subplot(3,4,6)
+        plot(MM,Drag)
+        title("Drag (kN) vs. M#")
         xlabel("Mach #")
-        ylabel("Drag Coeff")
+        ylabel("Drag (kN)")
         
         %Bottom Right Plot
-        ax1y4 = nexttile(7);
-        plot(ax1y4,dd,P_amb_plot)
+        subplot(3,4,7)
+        plot(dd,P_amb_plot)
         title("Ambient Pressure over time")
         xlabel("iter")
         ylabel("Amb_Pressure (Pa)")
                 
         %Bottom Right Plot
-        ax2y4 = nexttile(8);
-        plot(ax2y4,dd,St4_P)
+        subplot(3,4,8)
+        plot(dd,St4_P)
         title("Station4 Pressure over time")
         xlabel("iter")
         ylabel("Station 4 (Pa)")
         
         %Bottom Right Plot
-        ax2y5 = nexttile(9);
-        plot(ax2y5,dd,St2_P)
+        subplot(3,4,9)
+        plot(dd,St2_P)
         title("Station2 Pressure over time")
         xlabel("iter")
         ylabel("Station 4 (Pa)")
         
         %Bottom Right Plot
-        ax2y6 = nexttile(10);
-        plot(ax2y6,dd,accel_p)
+        subplot(3,4,10)
+        plot(dd,accel_p)
         title("Acceleration Curve")
         xlabel("iter")
         ylabel("Acceleration (m/s^2)")
         
         %Bottom Right Plot
-        ax1y3 = nexttile(11);
-        plot(ax1y3,dd,accel_y)
-        title("Acceleration Curve Y - dir")
+        subplot(3,4,11)
+        plot(dd,Total_Thrust)
+        title("Total Thrust")
         xlabel("iter")
-        ylabel("Acceleration (m/s^2)")
+        ylabel("Thrust (kN)")
+        
+        subplot(3,4,12)
+        plot(dd,Lift*1000./Vehicle_Weight)
+        title("Lift Curve")
+        xlabel("iter")
+        ylabel("Lift (kN)")
         
         %saveas(h,sprintf('Fig%d.png',i));
     end
@@ -233,7 +247,7 @@ end
 
 
 function S4 = getCombustorOutlet(S2)
-    gamma = 1.4;
+    gamma = 1.3;
     R_J_kmolK = 8314; 
     MW_air = 28.965;
     CP_air_J_kgK = (R_J_kmolK/MW_air)*gamma/(gamma-1);
@@ -244,7 +258,7 @@ function S4 = getCombustorOutlet(S2)
 
     S4 = Station;
     S4.Mach = 1; % adaptive geometry and fuel flow ensures flow is choked
-    Tt4 = 2600;
+    Tt4 = 2400;
     S4.TotalTemperature_K = Tt4; % adaptive fuel flow will maximize stagnation temperature
     S4.Temperature_K = S4.TotalTemperature_K / (1+0.5*(gamma-1)*S4.Mach^2); % solve for exit Temperature
     S4.Velocity_ms = S4.Mach *sqrt(gamma*(R_J_kmolK/MW_air)*S4.Temperature_K); % Solve for exit velocity
@@ -254,13 +268,20 @@ function S4 = getCombustorOutlet(S2)
     mdot_air = S2.MassFlowRate_kgs;
     dH_air = mdot_air*CP_air_J_kgK*(Tt4-Tt2); % Joules/sec
     mdot_f = dH_air /(H_f_J_kg - Cp_f_J_kgK*(Tt4-T_f_K)- H_vap_J_kg); %kg/sec
+    if mdot_f<0
+        mdot_f = 0;
+    end
     S4.MassFlowRate_kgs = mdot_air + mdot_f;
-    
     %Solve for Pressure at exit - This is an estimate... Cal's model is
     %real model
-    S4.Pressure_Pa = S2.Pressure_Pa*((1+0.5*(gamma-1)*S2.Mach^2)/(1+0.5*(gamma-1))); % Estimate of pressure gain for supersonic combustion
-    S4.TotalPressure_Pa = S4.Pressure_Pa*(1+0.5*(gamma-1)*S4.Mach^2)^(gamma/(gamma-1)); % Results in stagnation Pressure loss
-    S4.TotalPressure_Pa = S4.TotalPressure_Pa*(0.4);
+    S4.Pressure_Pa = S2.Pressure_Pa*(1+gamma*S2.Mach^2)/(1+gamma); % Estimate of pressure gain for supersonic combustion
+    S4.TotalPressure_Pa = S4.Pressure_Pa*(1+0.5*(gamma-1))^(gamma/(gamma-1)); % Results in stagnation Pressure loss
+    etab = 0.95;
+    %Solve for Fuel Flow rate method2
+    Cpi = CpPoly(S2.Temperature_K);
+    Cpb = CpPoly(S4.Temperature_K);
+    f = (Cpb*Tt4/(Cpi*Tt2) - 1) / (etab*H_f_J_kg/(Cpi*Tt2) - Cpb*Tt4/(Cpi*Tt2));
+    mdot_f_b = f*mdot_air;
     %Solve for variable throat Area
     S4.Area_m2 = S4.MassFlowRate_kgs * (R_J_kmolK/MW_air) * S4.Temperature_K / (S4.Pressure_Pa*S4.Velocity_ms); % m^2
 end
