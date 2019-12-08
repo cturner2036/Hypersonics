@@ -178,7 +178,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         %Middle Right Plot
         subplot(3,4,4)
         plot(time,mdot_ff,'LineWidth',1.2)
-        title("fuel mass flow vs. iterations")
+        title("fuel mass flow vs. time")
         xlabel("time (s)")
         ylabel("fuel mass flow")
         %xlim([0 1200])
@@ -188,7 +188,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         %Bottom Left Plot
         subplot(3,4,5)
         plot(time,Vehicle_Weight,'LineWidth',1.2)
-        title("Vehicle Weight vs. Iterations")
+        title("Vehicle Weight vs. time")
         xlabel("time (s)")
         ylabel("weight [kgs]")
         %xlim([0 1200])
