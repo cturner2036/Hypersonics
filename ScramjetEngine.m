@@ -23,6 +23,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
     cnt = 1;
     i = 2;
     time(cnt) = 0;
+    iPlot = 90; %incrementor for plotting
     while Total_Weight >= Dry_Weight
         %Assume run 1 second iterations, depending on mf_dot will determine
         
@@ -89,7 +90,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         end
         %   Run Flow_Properties to calculate Thrust Values
         %[Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit(Station4.TotalPressure_Pa),throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
-        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,throat_height,body_width,1,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.3);
+        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,(Station4.Area_m2/bodywidth),body_width,1,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.3);
         Engine_Thrust = NozzEff*Engine_Thrust;    
         
         % Calculate Aero Drag Thrust
@@ -112,7 +113,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         Total_Thrust(i) = (Engine_Total_Thrust/1000) - D - (Total_Weight*grav*sind(FP_Angle))/1000;
         accel_x = ((Engine_Total_Thrust/1000 - D)*cosd(FP_Angle) - (L+Engine_Lift)*sind(FP_Angle))*1000/Total_Weight;
         accel_y = ((Engine_Total_Thrust/1000 - D)*sind(FP_Angle) + (L+Engine_Lift)*cosd(FP_Angle) - (Total_Weight*grav)/1000)*1000/Total_Weight;
-        accel = sqrt(accel_x^2 + accel_y^2);
+        accel = Total_Thrust(i)*1000/Total_Weight; %sqrt(X^2 +Y^2) looses it's sign.  Need to show negative acceleration for negative thrust
         Lift(i) = L + Engine_Lift;
         veloc = veloc + accel*timestep;
         distance = veloc*timestep;
@@ -142,6 +143,8 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         i = i + 1
         time(cnt) = time(cnt-1) + mdot_ff(cnt);
         %%%%%% Plotting Stuff %%%%%%%%%%%%%%%
+        if i > iPlot
+        iPlot = iPlot+100;
         dd = linspace(0,i,i-1);
         %h = figure;
         
@@ -251,6 +254,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         grid on
         
         %saveas(h,sprintf('Fig%d.png',i));
+        end
     end
 
    %plot(xx,yy)
