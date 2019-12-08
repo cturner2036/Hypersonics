@@ -171,7 +171,7 @@ for i = 1:step_size-1
 end
 
 % Combined Thrust and Lift Term (kN)
-Engine_Thrust = (  + T_jet + T_base)/1000;
+Engine_Thrust = (T_pressure + T_jet + T_base)/1000;
 Engine_Lift = (L_pressure - L_jet + L_base)/1000;
 
 
