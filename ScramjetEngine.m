@@ -18,9 +18,11 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
     yy(1) = drop_height/3.281;
     MM(1) = FreestreamMach;
     Isp(1) = 3000;
+    NozzEff = 0.86;
     timestep = 1; %[s]
     cnt = 1;
     i = 2;
+    time(cnt) = 0;
     while Total_Weight >= Dry_Weight
         %Assume run 1 second iterations, depending on mf_dot will determine
         
@@ -77,7 +79,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         if cnt == 1
             %   Ideal Nozzle
             %[throat_height, throat_angle, cowl_height, body_width, step_size] = Plug_Nozzle(throat_angle, throat_height, cowl_height, body_width, step_size);
-            [throat_height,throat_angle,cowl_height,body_width,step_size] = Plug_Nozzle(30,0.163,1,1,100);
+            [throat_height,throat_angle,cowl_height,body_width,step_size] = Plug_Nozzle(30,0.455,1,.35735,100);
             %   Truncated Nozzle
             %[x,y] = Plug_Nozzle_Style2(AR,eta_b,throat_height,step_size);
             [x,y,local_turn] = Plug_Nozzle_Style2(1.8608,0.05,throat_height,step_size);
@@ -88,7 +90,8 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         %   Run Flow_Properties to calculate Thrust Values
         %[Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit(Station4.TotalPressure_Pa),throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
         [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,throat_height,body_width,1,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.3);
-  
+        Engine_Thrust = NozzEff*Engine_Thrust;    
+        
         % Calculate Aero Drag Thrust
         %Run Cd_Import Before execution
         %D = DragCoeff(FreestreamMach, AngleofAttack, phi, NFC, AFC, DynamicPressure, TotalWeight);
@@ -137,13 +140,14 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
             helpme = true; 
         end
         i = i + 1
+        time(cnt) = time(cnt-1) + mdot_ff(cnt);
         %%%%%% Plotting Stuff %%%%%%%%%%%%%%%
         dd = linspace(0,i,i-1);
         %h = figure;
         
         %Top Left Plot
         subplot(3,4,1);
-        plot(xx,yy)
+        plot(xx,yy,'LineWidth',1.2)
         title(["Distance (m), Flight Angle:" + num2str(FP_Angle)])
         xlabel('Distance (m)')
         ylabel("height (m)")
@@ -153,60 +157,67 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         
         %Top Right Plot
         subplot(3,4,2)
-        plot(dd,MM)
+        plot(time,MM,'LineWidth',1.2)
         title("Mach # vs time")
         ylabel('Mach #')
-        xlabel('iterations')
+        xlabel('time (s)')
         %xlim([0 1200])
         %ylim([4 8])
+        grid on
         
         %Middle Left Plot
         subplot(3,4,3)
-        plot(dd,Isp)
+        plot(time,Isp,'LineWidth',1.2)
         title("Isp vs. Iterations")
-        xlabel("iterations")
+        xlabel("time (s)")
         ylabel("Specific Thrust (Isp)")
         %xlim([0 1200])
         %ylim([2500 8100])
-        
+        grid on        
+     
         %Middle Right Plot
         subplot(3,4,4)
-        plot(dd,mdot_ff)
+        plot(time,mdot_ff,'LineWidth',1.2)
         title("fuel mass flow vs. iterations")
-        xlabel("iterations")
+        xlabel("time (s)")
         ylabel("fuel mass flow")
         %xlim([0 1200])
         %ylim([0 2])
+        grid on
         
         %Bottom Left Plot
         subplot(3,4,5)
-        plot(dd,Vehicle_Weight)
+        plot(time,Vehicle_Weight,'LineWidth',1.2)
         title("Vehicle Weight vs. Iterations")
-        xlabel("iterations")
+        xlabel("time (s)")
         ylabel("weight [kgs]")
         %xlim([0 1200])
         %ylim([2300 3900])
+        grid on
         
         %Bottom Right Plot
         subplot(3,4,6)
-        plot(MM,Drag)
+        plot(MM,Drag,'LineWidth',1.2)
         title("Drag (kN) vs. M#")
         xlabel("Mach #")
         ylabel("Drag (kN)")
+        grid on
         
         %Bottom Right Plot
         subplot(3,4,7)
-        plot(dd,P_amb_plot)
+        plot(time,P_amb_plot,'LineWidth',1.2)
         title("Ambient Pressure over time")
-        xlabel("iter")
+        xlabel("time (s)")
         ylabel("Amb_Pressure (Pa)")
-                
+        grid on
+        
         %Bottom Right Plot
         subplot(3,4,8)
-        plot(dd,St4_P)
+        plot(time,St4_P,'LineWidth',1.2)
         title("Station4 Pressure over time")
-        xlabel("iter")
+        xlabel("time (s)")
         ylabel("Station 4 (Pa)")
+        grid on
         
         %Bottom Right Plot
         subplot(3,4,9)
@@ -214,26 +225,30 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         title("Station2 Pressure over time")
         xlabel("iter")
         ylabel("Station 4 (Pa)")
+        grid on
         
         %Bottom Right Plot
         subplot(3,4,10)
-        plot(dd,accel_p)
+        plot(time,accel_p,'LineWidth',1.2)
         title("Acceleration Curve")
-        xlabel("iter")
+        xlabel("time (s)")
         ylabel("Acceleration (m/s^2)")
+        grid on
         
         %Bottom Right Plot
         subplot(3,4,11)
-        plot(dd,Total_Thrust)
+        plot(time,Total_Thrust,'LineWidth',1.2)
         title("Total Thrust")
-        xlabel("iter")
+        xlabel("time (s)")
         ylabel("Thrust (kN)")
+        grid on
         
         subplot(3,4,12)
-        plot(dd,Lift*1000./Vehicle_Weight)
+        plot(time,Lift*1000./Vehicle_Weight,'LineWidth',1.2)
         title("Lift Curve")
-        xlabel("iter")
+        xlabel("time (s)")
         ylabel("Lift (kN)")
+        grid on
         
         %saveas(h,sprintf('Fig%d.png',i));
     end
