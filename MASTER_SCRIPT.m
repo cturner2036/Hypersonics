@@ -36,7 +36,7 @@ Q = 1500;   %initial Q
 FreeMach = 4.0;
 AngleofAttack = 0.0;
 Dry_Weight = 5051.142*.453592;  %[kg]
-Fuel_Weight = (120.179*(0.0254)^3) *792.5; %[kg] Volume(ft^3)converted to m^3 times density of JP-7
+Fuel_Weight = (120.179*(0.3048)^3) *792.5; %[kg] Volume(ft^3)converted to m^3 times density of JP-7
 FP_Angle = 0;
 SI_Flag = 0;
 
