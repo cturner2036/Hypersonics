@@ -274,7 +274,7 @@ function S4 = getCombustorOutlet(S2)
     S4.MassFlowRate_kgs = mdot_air + mdot_f;
     %Solve for Pressure at exit - This is an estimate... Cal's model is
     %real model
-    S4.Pressure_Pa = S2.Pressure_Pa*(1+gamma*S2.Mach^2)/(1+gamma); % Estimate of pressure gain for supersonic combustion
+    S4.Pressure_Pa = S2.Pressure_Pa*(1+0.5*(gamma-1)*S2.Mach^2)/(1+0.5*(gamma-1)); % Estimate of pressure gain for supersonic combustion
     S4.TotalPressure_Pa = S4.Pressure_Pa*(1+0.5*(gamma-1))^(gamma/(gamma-1)); % Results in stagnation Pressure loss
     etab = 0.95;
     %Solve for Fuel Flow rate method2
