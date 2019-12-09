@@ -88,10 +88,10 @@ for i = 1:step_size
     
     % Calculate Coordinates
     if i == 1
-        x_hold = x_nd(i)*exit_height;
-        y_hold = y_nd(i)*exit_height;
+        x_hold = x_nd(i)*exit_area;
+        y_hold = y_nd(i)*exit_area;
     end
-    l(i) = l_nd(i)*exit_height;
+    l(i) = l_nd(i)*exit_area;
     x(i) = (x_nd(i)-x_nd(1))*exit_area;
     y(i) = (y_nd(i)-y_nd(1))*exit_area;
     
