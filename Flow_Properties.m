@@ -1,4 +1,4 @@
-function [Engine_Thrust, Engine_Lift, Final_Stag_Temperature] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit,throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
+function [Engine_Thrust, Engine_Lift, Final_Stag_Temperature] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit,throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma, cowl_height);
 % Read Me %
 % This script takes the x,y contour data from the contour scripts, along
 % with the throat angle, throat area, local turn, step size, and body
@@ -50,7 +50,7 @@ Static_Pressure(1) = P_exit;
 Stagnation_Pressure(1) = Pt_exit;
 
 % Geometry Values
-Base_height = y(end);
+Base_height = cowl_height - y(end);
 Base_area = Base_height*body_width;
 
 % Exit Combustor Velocity
