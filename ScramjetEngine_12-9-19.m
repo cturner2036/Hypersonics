@@ -85,18 +85,19 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
             Cowl_Height_m = 0.311601681598953/Body_Width_m; %[m]
             Outlet_angle_deg = 30;
             step_size = 100;
-            [throat_height,throat_angle,cowl_height,body_width,step_size] = Plug_Nozzle(Outlet_angle_deg,Throat_Height_m,Cowl_Height_m,Body_Width_m,step_size);
+            [throat_height,throat_angle,cowl_height,body_width,step_size, AR] = Plug_Nozzle(Outlet_angle_deg,Throat_Height_m,Cowl_Height_m,Body_Width_m,step_size);
             %   Truncated Nozzle
             %[x,y] = Plug_Nozzle_Style2(AR,eta_b,throat_height,step_size);
-            AR = cowl_height/throat_height;
-            [x,y,local_turn] = Plug_Nozzle_Style2(AR,0.05,throat_height,step_size);
+            %AR = cowl_height/throat_height;
+            throat_area = Throat_Height_m*Body_Width_m;
+            [x,y,local_turn] = Plug_Nozzle_Style2(AR,0.05,throat_area,step_size,1.3);
             spd_snd = sqrt(gamma*R_J_kmolK/MW_air*Station0.Temperature_K);
             veloc = FreestreamMach*spd_snd;
             height = drop_height;
         end
         %   Run Flow_Properties to calculate Thrust Values
         %[Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit(Station4.TotalPressure_Pa),throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
-        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,(Station4.Area_m2/body_width),body_width,1,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.4);
+        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,(Station4.Area_m2/body_width),body_width,1,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.3,Cowl_Height_m);
         Engine_Thrust = NozzEff*Engine_Thrust;    
         
         % Calculate Aero Drag Thrust
