@@ -1,4 +1,4 @@
-function [x,y,local_turn] = Plug_Nozzle_Style2(AR, eta_b, throat_height, step_size)
+function [x,y,local_turn] = Plug_Nozzle_Style2(AR, eta_b, throat_area, step_size, gamma)
 % Nozzle Contour, Rapid Method for Plug Nozzle Design
 %clc, clear all
 
@@ -8,8 +8,7 @@ function [x,y,local_turn] = Plug_Nozzle_Style2(AR, eta_b, throat_height, step_si
 % obtained from the Approximate Method and the throat height. This will
 % feed into the flow properties script to calculate thrust and lift.
 
-gamma = 1.4;                     % Ratio Specific Heats
-exit_height = AR*throat_height;  % Exit Height
+exit_area = AR*throat_area;  % Exit Height
 
 % Set Matrices
 turn_angle = zeros(1,step_size);
@@ -89,12 +88,12 @@ for i = 1:step_size
     
     % Calculate Coordinates
     if i == 1
-        x_hold = x_nd(i)*exit_height;
-        y_hold = y_nd(i)*exit_height;
+        x_hold = x_nd(i)*exit_area;
+        y_hold = y_nd(i)*exit_area;
     end
-    l(i) = l_nd(i)*exit_height;
-    x(i) = (x_nd(i)-x_nd(1))*exit_height;
-    y(i) = (y_nd(i)-y_nd(1))*exit_height;
+    l(i) = l_nd(i)*exit_area;
+    x(i) = (x_nd(i)-x_nd(1))*exit_area;
+    y(i) = (y_nd(i)-y_nd(1))*exit_area;
     
 end
 
@@ -110,18 +109,18 @@ x_length = real(x(end))-x(1);
 % disp(cout)
 
 % Calcuate Cowl Position w.r.t. Ramp Origin
-slope = (y(2)-y(1))/(x(2)-x(1));
-slope = -1/slope;
-n = 1000;
-xc = linspace(0,0.4,n);
-yc = slope.*xc;
-for i = 1:n
-    d = sqrt( xc(i)^2 + yc(i)^2);
-    if d > throat_height
-        xnew = xc(i);
-        ynew = yc(i);
-        break;
-    end
-end
+%slope = (y(2)-y(1))/(x(2)-x(1));
+%slope = -1/slope;
+%n = 1000;
+%xc = linspace(0,0.4,n);
+%yc = slope.*xc;
+%for i = 1:n
+ %   d = sqrt( xc(i)^2 + yc(i)^2);
+  %  if d > throat_height
+   %     xnew = xc(i);
+    %    ynew = yc(i);
+     %   break;
+    %end
+%end
 
 local_turn = flip(turn_steps);
