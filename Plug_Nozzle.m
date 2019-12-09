@@ -1,4 +1,4 @@
-function [throat_height, throat_angle, cowl_height, body_width, step_size] = Plug_Nozzle(throat_angle, throat_height, cowl_height, body_width, step_size)
+function [throat_height, throat_angle, cowl_height, body_width, step_size, AR] = Plug_Nozzle(throat_angle, throat_height, cowl_height, body_width, step_size)
 % Nozzle Contour, Approximate Method from Characteristic Line
 %clc, clear all, close all
 % Nozzle Contour, Approximate Method from Characteristic Line
