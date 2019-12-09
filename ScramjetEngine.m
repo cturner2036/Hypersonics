@@ -80,17 +80,23 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         if cnt == 1
             %   Ideal Nozzle
             %[throat_height, throat_angle, cowl_height, body_width, step_size] = Plug_Nozzle(throat_angle, throat_height, cowl_height, body_width, step_size);
-            [throat_height,throat_angle,cowl_height,body_width,step_size] = Plug_Nozzle(30,0.455,1,.35735,100);
+            Body_Width_m = 0.35735; % [m]
+            Throat_Height_m = 0.029658583785441/Body_Width_m; %[m]
+            Cowl_Height_m = 0.311601681598953/Body_Width_m; %[m]
+            Outlet_angle_deg = 30;
+            step_size = 100;
+            [throat_height,throat_angle,cowl_height,body_width,step_size] = Plug_Nozzle(Outlet_angle_deg,Throat_Height_m,Cowl_Height_m,Body_Width_m,step_size);
             %   Truncated Nozzle
             %[x,y] = Plug_Nozzle_Style2(AR,eta_b,throat_height,step_size);
-            [x,y,local_turn] = Plug_Nozzle_Style2(1.8608,0.05,throat_height,step_size);
+            AR = cowl_height/throat_height;
+            [x,y,local_turn] = Plug_Nozzle_Style2(AR,0.05,throat_height,step_size);
             spd_snd = sqrt(gamma*R_J_kmolK/MW_air*Station0.Temperature_K);
             veloc = FreestreamMach*spd_snd;
             height = drop_height;
         end
         %   Run Flow_Properties to calculate Thrust Values
         %[Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit(Station4.TotalPressure_Pa),throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
-        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,(Station4.Area_m2/body_width),body_width,1,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.3);
+        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,(Station4.Area_m2/body_width),body_width,1,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.4);
         Engine_Thrust = NozzEff*Engine_Thrust;    
         
         % Calculate Aero Drag Thrust
@@ -107,7 +113,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         
         %Rocket EQ
         %F = ma > a = F/m   %%% Change AngleofAttack to Pitch
-        Engine_Total_Thrust = (Engine_Thrust*1000 + Inlet.InletAxialForce_N - Station2.MassFlowRate_kgs*Station0.Velocity_ms);
+        Engine_Total_Thrust = (Engine_Thrust*1000 + Inlet.InletAxialForce_N - (Station2.MassFlowRate_kgs*Station2.Velocity_ms+Station2.Area_m2*(Station2.Pressure_Pa-P_amb)));
         %Isp should be around 1000-2000
         Isp(i) = Engine_Total_Thrust/(mdot_ff(i)*grav);
         Total_Thrust(i) = (Engine_Total_Thrust/1000) - D - (Total_Weight*grav*sind(FP_Angle))/1000;
@@ -247,7 +253,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         grid on
         
         subplot(3,4,12)
-        plot(time,Lift*1000./Vehicle_Weight,'LineWidth',1.2)
+        plot(time,Lift,'LineWidth',1.2)
         title("Lift Curve")
         xlabel("time (s)")
         ylabel("Lift (kN)")
