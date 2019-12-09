@@ -90,7 +90,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
         end
         %   Run Flow_Properties to calculate Thrust Values
         %[Engine_Thrust, Engine_Lift] = Flow_Properties(step_size,local_turn,P_amb,T_exit,Pt_exit(Station4.TotalPressure_Pa),throat_angle,throat_height,body_width,M_throat,y,x,alpha,Q,mdot,gamma);
-        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,(Station4.Area_m2/bodywidth),body_width,1,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.3);
+        [Engine_Thrust, Engine_Lift, StagnationTemp] = Flow_Properties(step_size,local_turn,Station0.Pressure_Pa,Station4.Temperature_K,Station4.TotalPressure_Pa,throat_angle,(Station4.Area_m2/body_width),body_width,1,y,x,AngleofAttack,71820,Station4.MassFlowRate_kgs,1.3);
         Engine_Thrust = NozzEff*Engine_Thrust;    
         
         % Calculate Aero Drag Thrust
