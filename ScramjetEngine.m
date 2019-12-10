@@ -148,7 +148,7 @@ function EnginePerf = ScramjetEngine(InletMap,DynamicPressure,FreestreamMach,Ang
             helpme = true; 
         end
         i = i + 1
-        time(cnt) = time(cnt-1) + mdot_ff(cnt);
+        time(cnt) = time(cnt-1) + (1/mdot_ff(cnt));
         %%%%%% Plotting Stuff %%%%%%%%%%%%%%%
         if i > iPlot
         iPlot = iPlot+100;
